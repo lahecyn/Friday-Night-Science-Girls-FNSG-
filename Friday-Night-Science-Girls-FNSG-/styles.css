@@ -1,230 +1,106 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-#game-container {
-  background-color: rgb(139, 68, 68);
-  padding: 50px;
-  margin: 0 auto;
-  border: 5px solid black;
-  border-radius: 30px;
-  width: 1000px;
-  height: 500px;
-  margin-top: 12px;
-  overflow: hidden;
-  background-image: url(/background.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  position: relative;
-} 
-#makoto_p {
+/* Fonte original do FNF: baixe "VCR OSD Mono" e salve como fonts/vcr.ttf (veja fonts/LEIA-ME.txt).
+   Enquanto o arquivo não existir, o navegador usa a fonte reserva automaticamente. */
+@font-face { font-family: "VCR OSD Mono"; src: local("VCR OSD Mono"), url("fonts/vcr.ttf") format("truetype"); font-weight: 100 900; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0d0d14; color: #fff;
+  font-family: "VCR OSD Mono", "Arial Black", "Segoe UI Black", Impact, "Trebuchet MS", sans-serif; font-weight: 900; }
 
-  position: absolute;
+/* TEXTO LEGÍVEL: contorno preto em todas as letras */
+body, button { text-shadow: -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 5px 0 #000; letter-spacing: .5px; }
 
-  transform: translate(400px, 100px);
-  
-  width: 850px;
+/* container = tela inteira. O palco ocupa 100% da janela (o JS ajusta o tamanho),
+   então não existe mais "moldura" ou borda delimitando a área. */
+#game-container { position: fixed; inset: 0; background: #402030 url("background.png") center / cover no-repeat; }
+#game-container::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+#palco { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale(var(--escala, 1)); overflow: hidden; z-index: 1; }
+.tela { position: absolute; inset: 0; }
+.escondido { display: none !important; }
+h1 { font-size: 86px; line-height: .92; background: linear-gradient(#fff, #ffd23f 60%, #ff8a3d); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 6px #000; paint-order: stroke fill; text-shadow: none; filter: drop-shadow(6px 8px 0 #000); }
+h2 { font-size: 52px; }
 
-}
-img[src*="Down_makoto.png"] {
-    position: relative;
-    top: 100px;
-}
-#down_makoto {
-  
-  position: absolute;
+/* ---------- MENUS ---------- */
+.menu .item { font-size: 60px; color: #fff; cursor: pointer; padding: 4px 0; transition: transform .12s, color .12s; width: fit-content; }
+.menu .item.sel { color: #ffd23f; transform: translateX(20px) scale(1.07); }
+.menu .item.sel::before { content: "▶ "; font-size: .6em; }
+#tela-menu { background: linear-gradient(90deg, rgba(0,0,0,.65), rgba(0,0,0,.2)); padding: 8vh 7vw; }
+#tela-menu .sub { font-size: 24px; margin: 14px 0 40px; color: #ffe9a8; }
+.rodape { position: absolute; bottom: 12px; width: 100%; text-align: center; font-size: 17px; color: #ddd; }
 
-  width: 850px;
-  
-  transform: translateY(400px, 110px);
+/* ---------- SEMANAS (referência: tela de weeks do FNF) ---------- */
+#tela-semanas { background: #000; display: flex; flex-direction: column; }
+#sem-topo { height: 66px; flex: none; background: #f9cf51; color: #000; display: flex; justify-content: space-between; align-items: center; padding: 0 36px; font-size: 28px; text-shadow: none; }
+#sem-faixa-cor { height: 350px; flex: none; background: var(--cor, #f9cf51); position: relative; display: flex; justify-content: center; align-items: flex-end; gap: 120px; padding-bottom: 14px; transition: background .25s; }
+.slot { position: relative; overflow: hidden; flex: none; }
+.slot img { position: absolute; max-width: none; image-rendering: auto; }
+.slot span { display: none; }
+.slot.sem-sprite img { display: none; }
+.slot.sem-sprite span { display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; height: 100%; padding: 10px;
+  background: var(--cor, #888); border: 5px solid #000; border-radius: 24px; font-size: 28px; }
+.sem-char { filter: drop-shadow(0 6px 0 rgba(0,0,0,.35)); }
+.sem-char.sem-sprite span { background: rgba(0,0,0,.25); }
+#sem-baixo { flex: 1; display: grid; grid-template-columns: 1fr 1.5fr 1fr; padding: 28px 40px 50px; min-height: 0; }
+#sem-faixas { text-align: center; font-size: 26px; line-height: 1.6; color: #ff6f91; }
+#sem-faixas b { display: block; font-size: 34px; margin-bottom: 8px; color: #ff4d79; }
+.menu-semanas { display: flex; flex-direction: column; align-items: center; }
+.menu-semanas .item { font-size: 60px; color: #8a8a8a; width: auto; line-height: 1.12; }
+.menu-semanas .item.sel { color: #fff; transform: scale(1.1); text-shadow: 0 0 18px rgba(255,255,255,.8), 4px 4px 0 #000; }
+.menu-semanas .item.sel::before { content: ""; }
+#sem-dif { display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 44px; height: 70px; }
+#dif-nome { min-width: 220px; text-align: center; }
+.seta-dif { cursor: pointer; font-size: 46px; color: #fff; transition: transform .1s; user-select: none; }
+.seta-dif:hover { transform: scale(1.25); color: #ffd23f; }
 
-}
+/* ---------- OPTIONS ---------- */
+#tela-options { background: rgba(0,0,0,.72); padding: 6vh 8vw; }
+#opt-teclas { margin: 22px 0; }
+.opt-linha { display: flex; align-items: center; gap: 22px; margin-bottom: 14px; font-size: 34px; }
+.opt-linha .rot { width: 260px; }
+.opt-linha button, .opt-btn { font: inherit; font-size: 28px; min-width: 190px; padding: 10px 20px; background: #1d1d2b; color: #fff; border: 4px solid #fff; border-radius: 14px; cursor: pointer; }
+.opt-linha button:hover, .opt-btn:hover { background: #2c2c40; border-color: #ffd23f; }
+.opt-linha button.ouvindo { border-color: #ffd23f; color: #ffd23f; }
+#opt-extras { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 26px; }
+#opt-msg { margin-top: 24px; font-size: 19px; color: #ddd; }
 
-#right_makoto {
+/* ---------- JOGO ---------- */
+#area-jogo { position: absolute; left: calc(50% - 640px); top: calc(50% - 360px); width: 1280px; height: 720px; }
+#campo { position: absolute; inset: 0; z-index: 3; }
+.sprite { position: absolute; bottom: 0; z-index: 2; transition: transform .08s; }
+#sprite-opp { left: 10px; } #sprite-jog { right: 10px; }
+#area-jogo.multi #sprite-opp { left: 360px; } #area-jogo.multi #sprite-jog { right: 360px; }
+#sprite-opp.cantando { transform: scale(1.04); transform-origin: bottom center; }
+#nome-faixa { position: absolute; z-index: 5; left: 14px; top: 12px; font-size: 20px; color: #fff; }
+#palco.down #nome-faixa { top: auto; bottom: 12px; }
 
-  position: absolute;
+#hud-vida { position: absolute; z-index: 5; left: 0; right: 0; bottom: 22px; text-align: center; }
+#palco.down #hud-vida { bottom: auto; top: 22px; }
+#vida-wrap { position: relative; width: 600px; height: 24px; margin: 0 auto 10px; border: 5px solid #000; border-radius: 6px; background: var(--cor-opp, #e74c3c); box-shadow: 0 0 18px rgba(0,0,0,.6); }
+#vida-opp { position: absolute; inset: 0; }
+#vida-jog { position: absolute; top: 0; bottom: 0; right: 0; width: 50%; background: var(--cor-jog, #2ecc71); }
+.icone { position: absolute; top: 50%; width: 120px; height: 120px; margin-top: -60px; transition: transform .08s ease-out; transform-origin: center bottom; }
+.icone.bump { transform: scale(1.22); }
+.icone img { width: 100%; height: 100%; object-fit: contain; }
+.icone span { display: none; }
+.icone.sem-icone img { display: none; }
+.icone.sem-icone span { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 76px; text-shadow: none; }
+#placar { font-size: 24px; padding-top: 40px; }
+#aviso { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; font-size: 150px; pointer-events: none; }
+#pausa { position: absolute; inset: 0; z-index: 9; background: rgba(0,0,0,.78); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+#pausa .menu .item { font-size: 52px; margin: 0 auto; }
 
-  transform: translate(400px, 100px);
-
-  width: 850px;
-
-}
-
-#left_makoto {
-
-  position: absolute;
-
-  transform: translate(400px, 100px);
-
-  width: 850px;
-
-}
-
-#up_makoto {
-
-  position: absolute;
-
-  transform: translate(400px, 100px);
-
-  width: 850px;
-
-}
-#idle_makoto {
-
-  position: absolute;
-
-  transform: translate(400px, 100px);
-
-  width: 850px;
-
-}
-
-#idle_monokuma {
-
-  position: absolute;
-
-  transform: translate(-300px, 100px);
-
-  width: 950px;
-}
-
-.escondido {
-
-  display: none;
-
-}
-.arrowS {
-  width: 200px;
-  height: 200px;
-  opacity: 0.93;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-.pressionamento {
-
-  box-shadow: inset 5px, 5px, 5px, rgba(77, 47, 47, 0.274);
-  opacity: 1.3;
-  animation-name: teclapressionada;
-  animation-duration: 0.2s;
-  animation-timing-function: linear;
-  animation-iteration-count: 1;
-  transition: linear
-
-}
-.pos_leftS {
-  position: absolute;
-  transform: translate(100px, 350px);
-  z-index: 10;
-}
-
-.pos_downS {
-  position: absolute;
-  transform: translate(300px, 350px);
-  z-index: 10;
-}
-
-.pos_upS {
-  position: absolute;
-  transform: translate(510px, 350px);
-  z-index: 10;
-}
-
-.pos_rightS {
-  position: absolute;
-  transform: translate(710px, 350px);
-  z-index: 10;
-}
-
-.arrowS-left {
-  background-image: url('Arrows_fnf/ArrowLeft.png');
-  transition: filter 0.1s ease;
-  transform: 0.1s ease;
-}
-
-.arrowS-down {
-  background-image: url('Arrows_fnf/ArrowDown.png');
-  transition: filter 0.1s ease;
-  transform: 0.1s ease;
-}
-
-.arrowS-up {
-  background-image: url('Arrows_fnf/ArrowUp.png');
-  transition: filter 0.1s ease;
-  transform: 0.1s ease;
-}
-
-.arrowS-right {
-  background-image: url('Arrows_fnf/ArrowRight.png');
-  transition: filter 0.1s ease;
-  transform: 0.1s ease;
-}
-
-#arrowleft {
-    width: 200px;
-    height: 200px; 
-    animation-name: DescerSeta;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear ;
-    transition: linear; 
-}
-#arrowdown {
-    width: 200px;
-    height: 200px;
-    animation-name: DescerSeta;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear ;
-    transition: linear; 
-}
-#arrowup {
-    width: 200px;
-    height: 200px;
-    animation-name: DescerSeta;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear ;
-    transition: linear; 
-}
-#arrowright {
-    width: 200px;
-    height: 200px; 
-    animation-name: DescerSeta;
-    animation-duration: 3s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear ;
-    transition: linear; 
-}
-
-.seta-descendo {
-  position: absolute;
-  bottom: 0;
-  width: 200px;
-  height: 200px;
-  animation: DescerSeta 2s linear forwards;
-}
-
-@keyframes DescerSeta {
-  0% {
-    transform: translate(100px, -250px);
-  }
-  100% {  
-    transform: translate(100px, 600px);
-  }
-}
-
-@keyframes teclapressionada {
-  
-  0% {
-    transform: scale(1.0);
-    transform: translate(100px, 600px);
-  }  
-  50% {
-    transform: scale(1.2);
-    transform: translate(100px, 600px);
-  }
-  100% {
-    transform: scale(1.0);
-    transform: translate(100px, 600px);
-  }
-}
+/* ---------- RESULTADO ---------- */
+#tela-resultado { display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.78); }
+#cartao { width: 920px; max-width: 94%; padding: 34px 42px; border-radius: 24px; background: linear-gradient(#1b1b2a, #12121c); border: 5px solid var(--cor, #fff);
+  font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif; font-weight: normal; text-shadow: none; box-shadow: 0 0 40px rgba(0,0,0,.7); }
+#cartao h2 { font-family: "Arial Black", Impact, sans-serif; font-size: 38px; color: var(--cor); margin-bottom: 8px; text-shadow: 3px 3px 0 #000; }
+#cartao .stats { font-size: 16px; color: #cfcfe0; margin-bottom: 14px; }
+#cartao p { line-height: 1.55; margin-bottom: 10px; font-size: 19px; }
+#cartao .curio { border-left: 5px solid var(--cor); padding-left: 14px; font-style: italic; }
+#cartao .placar-multi { display: flex; gap: 16px; margin: 10px 0 16px; }
+#cartao .placar-multi div { flex: 1; padding: 14px; border-radius: 14px; background: #0b0b12; border: 3px solid #444; text-align: center; font-size: 17px; }
+#cartao .placar-multi div.vencedor { border-color: #ffd23f; background: #2a2410; }
+#cartao .placar-multi b { display: block; font-size: 36px; font-family: "Arial Black", Impact, sans-serif; }
+.botoes { display: flex; gap: 12px; margin-top: 18px; }
+.botoes button { flex: 1; padding: 14px; font-size: 18px; font-weight: bold; border: 0; border-radius: 12px; cursor: pointer; background: var(--cor, #fff); color: #000; text-shadow: none; }
+.botoes button.sec { background: #34344a; color: #fff; }

@@ -1,50 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keyframes</title>
+  <title>Friday Night Science Girls</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="game-container">
-    <div id="zona-botoes">
+    <div id="palco">
 
-      <div id="arrowS-left" class="arrowS arrowS-left pos_leftS" > </div>
+      <!-- MENU PRINCIPAL -->
+      <section id="tela-menu" class="tela">
+        <h1>Friday Night<br>Science Girls</h1>
+        <p class="sub">SNCT · Mulheres na Ciência</p>
+        <div id="menu-principal" class="menu"></div>
+      </section>
 
-      <div id="arrowS-down" class="arrowS arrowS-down pos_downS">  </div>
+      <!-- SEMANAS (estilo FNF) -->
+      <section id="tela-semanas" class="tela escondido">
+        <div id="sem-topo"><span id="sem-score"></span><span id="sem-titulo-topo"></span></div>
+        <div id="sem-faixa-cor">
+          <div class="slot sem-char" id="sc-opp" data-altura="310"><img alt=""><span></span></div>
+          <div class="slot sem-char" id="sc-jog" data-altura="310"><img alt=""><span></span></div>
+          <div class="slot sem-char" id="sc-extra" data-altura="310"><img alt=""><span></span></div>
+        </div>
+        <div id="sem-baixo">
+          <div id="sem-faixas"></div>
+          <div id="lista-semanas" class="menu menu-semanas"></div>
+          <div id="sem-dif"><span id="dif-esq" class="seta-dif">◀</span><span id="dif-nome"></span><span id="dif-dir" class="seta-dif">▶</span></div>
+        </div>
+        <p class="rodape">↑ ↓ semana · ← → dificuldade · Enter jogar · Esc voltar</p>
+      </section>
 
-      <div id="arrowS-up" class="arrowS arrowS-up pos_upS"> </div>
+      <!-- OPTIONS -->
+      <section id="tela-options" class="tela escondido">
+        <h2>Options</h2>
+        <div id="opt-teclas"></div>
+        <div id="opt-extras"></div>
+        <p id="opt-msg">Clique em uma tecla e aperte a nova tecla (Esc cancela)</p>
+      </section>
 
-      <div id="arrowS-right" class="arrowS arrowS-right pos_rightS">  </div>
+      <!-- JOGO -->
+      <section id="tela-jogo" class="tela escondido">
+        <div id="area-jogo">
+          <div id="sprite-opp" class="slot sprite" data-altura="480"><img alt=""><span></span></div>
+          <div id="sprite-jog" class="slot sprite" data-altura="480"><img alt=""><span></span></div>
+          <canvas id="campo" width="1280" height="720"></canvas>
+          <div id="nome-faixa"></div>
+          <div id="hud-vida">
+            <div id="vida-wrap">
+              <div id="vida-opp"></div>
+              <div id="vida-jog"></div>
+              <div id="icone-opp" class="icone"><img alt=""><span></span></div>
+              <div id="icone-jog" class="icone"><img alt=""><span></span></div>
+            </div>
+            <div id="placar"></div>
+          </div>
+        </div>
+        <div id="aviso"></div>
+        <div id="pausa" class="escondido"><h2>Pausado</h2><div id="menu-pausa" class="menu"></div></div>
+      </section>
+
+      <!-- RESULTADO -->
+      <section id="tela-resultado" class="tela escondido"><div id="cartao"></div></section>
 
     </div>
-
-    <img src="characters/Idle_makoto.png" id="makoto_p">
-
-    <img src="characters/Right_makoto.png" id="right_makoto" class="escondido">
-
-    <img src="characters/Up_makoto.png" id="up_makoto" class="escondido">
-
-    <img src="characters/Left_makoto.png" id="left_makoto" class="escondido">
-
-    <img src="characters/Down_makoto.png" id="down_makoto" class="escondido" style="transform: translateY(400px, 110px);">
-
-    <img src="characters/Idle_monokuma.png" id="idle_monokuma">
-
-    <img src="Arrows_fnf/ArrowLeftC.png" id="arrowleft">
-
-    <img src="Arrows_fnf/ArrowDownC.png" id="arrowdown">
-
-    <img src="Arrows_fnf/ArrowUpC.png" id="arrowup">
-
-    <img src="Arrows_fnf/ArrowRightC.png" id="arrowright">
-
-    <script src="javascript.js"></script>
-
-    <div id="area-notas">
-      </div>
-
   </div>
+  <script src="javascript.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+Ícones da barra de vida (PNG quadrado, ex.: 150x150):
+ jogador_normal.png, jogador_vitoria.png, jogador_derrota.png
+ sonia_normal.png,  sonia_vitoria.png (jogador quase perdendo),  sonia_derrota.png (vida dela baixa)
+ (idem para katia e carol)
+Jogador olhando para a esquerda; oponente olhando para a direita.

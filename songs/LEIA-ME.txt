@@ -1,1 +1,0 @@
-Coloque aqui os mp3 das músicas (ex.: sonia.mp3) e preencha o campo "audio" em javascript.js.

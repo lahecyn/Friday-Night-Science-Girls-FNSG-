@@ -1,5 +1,0 @@
-FONTE ORIGINAL DO FNF: "VCR OSD Mono" (Riciery Leal).
-1) Baixe a fonte (ex.: no site dafont.com, buscando por "VCR OSD Mono").
-2) Renomeie o arquivo .ttf para  vcr.ttf  e coloque nesta pasta (fonts/).
-3) Recarregue o jogo (Ctrl+F5). Sem o arquivo, o jogo usa uma fonte reserva.
-Confira a licença da fonte antes de publicar (uso pessoal/educacional costuma ser permitido).

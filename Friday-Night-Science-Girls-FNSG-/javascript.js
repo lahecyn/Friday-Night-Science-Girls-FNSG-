@@ -14,6 +14,7 @@
           (ele nunca perde a partida, é só um ícone "cansado")
        Se faltar um estado, usa o "normal"; se faltar tudo, mostra um emoji.
        Jogador olhando para a ESQUERDA, oponente olhando para a DIREITA.
+   • Fundo da batalha: PNG 1920x1080 em /backgrounds/ (campo "fundo" da semana; "animacao" = ita, vulcao ou tv, veja fundos.js)
    • Música: mp3 em /songs/ e preencha "audio", "bpm" e "offset" da faixa.
    • Notas: edite "padroes". Cada texto = 1 compasso de 8 passos
        d=esquerda  f=baixo  j=cima  k=direita  -=vazio
@@ -27,7 +28,8 @@ const inv = (a) => a.map((s) => [...s].reverse().join(""));
 
 const SEMANAS = [
   {
-    id: "sonia", nome: "Sônia Guimarães", cor: "#f9cf51", extra: null,   // extra = id de um 3º personagem (opcional)
+    id: "sonia", nome: "Sônia Guimarães", cor: "#f9cf51", extra: null,
+    fundo: { imagem: "backgrounds/sonia.png", animacao: "ita" },   // extra = id de um 3º personagem (opcional)
     faixas: [
       { nome: "Infravermelho", bpm: 100, offset: 0, audio: null,
         padroes: ["d---j---", "-f---k--", "d-f-j-k-", "k-j-f-d-", "d---d---", "-f---j--", "d-f-k---", "---kjfd-"] },
@@ -45,6 +47,7 @@ const SEMANAS = [
   },
   {
     id: "katia", nome: "Katia Krafft", cor: "#e8644f", extra: null,
+    fundo: { imagem: "backgrounds/katia.png", animacao: "vulcao" },
     faixas: [
       { nome: "Magma", bpm: 120, offset: 0, audio: null,
         padroes: ["d-f-j-k-", "k-j-f-d-", "dfd-jkj-", "-f-j-f-k", "d-dfj-jk", "k-kjf-fd", "dfjk-fjd", "d-k-j-f-"] },
@@ -62,6 +65,7 @@ const SEMANAS = [
   },
   {
     id: "carol", nome: "Carol Shaw", cor: "#4aa3e0", extra: null,
+    fundo: { imagem: "backgrounds/carol.png", animacao: "tv" },
     faixas: [
       { nome: "Pixel", bpm: 140, offset: 0, audio: null,
         padroes: ["dfjk-fjd", "d-fjk-jf", "dfd-jkj-", "kjfd-dfj", "d-dfj-jk", "fjfkdkdj", "dfjkdfjk", "d-f-j-kd"] },
@@ -126,6 +130,7 @@ function ajustarEscala() {
   const s = Math.min(innerWidth / W, innerHeight / H);
   palco.style.width = innerWidth / s + "px"; palco.style.height = innerHeight / s + "px";
   palco.style.setProperty("--escala", s);
+  if (typeof FundoAnim !== "undefined") FundoAnim.redimensionar();
 }
 addEventListener("resize", ajustarEscala); ajustarEscala();
 function telaCheia() {
@@ -366,6 +371,7 @@ function iniciarSemana(si, fi, base) {
   delete $("icone-jog").dataset.chave; delete $("icone-opp").dataset.chave;
   atualizarHUD();
   irPara("jogo", null, pausar);
+  FundoAnim.iniciar(s.fundo);
   P.raf = requestAnimationFrame(loop);
 }
 
@@ -405,6 +411,7 @@ function loop() {
   if (!P.multi && P.poseOpp && agora > P.poseOpp) { P.poseOpp = 0; $("sprite-opp").classList.remove("cantando"); definirPose($("sprite-opp"), P.s.id, "Idle", P.s.nome, P.s.cor); }
   P.jogs.forEach((j) => { if (j.poseT && agora > j.poseT && !j.pressionada.some(Boolean)) { j.poseT = 0; definirPose(j.spriteEl, j.spriteId, "Idle", j.nome, j.cor); } });
 
+  FundoAnim.quadro();
   desenhar(t);
   if (t > P.notas[P.notas.length - 1].t + 1.5) return terminar(true);
   P.raf = requestAnimationFrame(loop);
@@ -522,13 +529,13 @@ function pausar() {
   const m = criarMenu($("menu-pausa"), [
     { txt: "Continuar", fn: retomar },
     { txt: "Reiniciar faixa", fn: () => { $("pausa").classList.add("escondido"); iniciarSemana(P.si, P.fi, P.base); } },
-    { txt: "Sair", fn: () => { P.fim = true; if (P.audio) P.audio.pause(); $("pausa").classList.add("escondido"); abrirSemanas(); } }
+    { txt: "Sair", fn: () => { P.fim = true; FundoAnim.parar(); if (P.audio) P.audio.pause(); $("pausa").classList.add("escondido"); abrirSemanas(); } }
   ]);
   menuAtivo = m; tela = "pausa"; aoVoltar = retomar;
 }
 function retomar() {
   $("pausa").classList.add("escondido");
-  P.inicio += performance.now() - P.pausaT; P.pausado = false;
+  P.inicio += performance.now() - P.pausaT; P.pausado = false; FundoAnim.retomar();
   if (P.audio && P.audioRodando) P.audio.play();
   tela = "jogo"; menuAtivo = null; aoVoltar = pausar;
   P.raf = requestAnimationFrame(loop);
@@ -575,7 +582,7 @@ function atualizarHUD() {
 function terminar(venceu) {
   if (P.fim) return;
   P.fim = true; cancelAnimationFrame(P.raf); if (P.audio) P.audio.pause();
-  $("aviso").textContent = "";
+  $("aviso").textContent = ""; FundoAnim.parar();
   const s = P.s, b = s.bio, cartao = $("cartao"), j = P.jogs[0];
   cartao.style.setProperty("--cor", s.cor);
 
@@ -609,6 +616,6 @@ function terminar(venceu) {
   irPara("resultado", null, () => abrirSemanas());
 }
 
-try { document.fonts.load('20px "VCR OSD Mono"'); } catch (e) {}
+try { document.fonts.load('20px "VCR OSD Mono"').catch(() => {}); } catch (e) {}
 [JOGADOR, ...SEMANAS.map((s) => s.id)].forEach(prepararPersonagem);
 abrirMenu();

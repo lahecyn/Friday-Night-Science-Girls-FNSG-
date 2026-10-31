@@ -64,6 +64,9 @@ h2 { font-size: 52px; }
 #opt-msg { margin-top: 24px; font-size: 19px; color: #ddd; }
 
 /* ---------- JOGO ---------- */
+#fundo-jogo { position: absolute; inset: 0; z-index: 0; background-position: center; background-size: cover; }
+#fundo-jogo.sem-fundo { background: transparent; }
+#fundo-anim { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; }
 #area-jogo { position: absolute; left: calc(50% - 640px); top: calc(50% - 360px); width: 1280px; height: 720px; }
 #campo { position: absolute; inset: 0; z-index: 3; }
 .sprite { position: absolute; bottom: 0; z-index: 2; transition: transform .08s; }
